@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro de Inventario</title>
+    <style>
+
+       body {
+    font-family: sans-serif;
+    margin: 0;
+    color: #333;
+}
+
+#seccion-registro, #seccion-empresa, #seccion-pass, #seccion-bloqueo, #seccion-tutorial {
+    background-image: url('fondo_registro.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#pantalla-libro {
+    background-image: url('inventario.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.titulo-sistema {
+    text-align: center;
+    color: #ffffff;
+    font-size: 26px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.encabezado-empresa-centrado {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.encabezado-empresa-centrado h2 {
+    margin: 0;
+    font-size: 32px;
+    color: #2c3e50;
+    text-transform: uppercase;
+}
+
+.encabezado-empresa-centrado p {
+    margin: 6px 0 0 0;
+    color: #7f8c8d;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+
+.header-libro { 
+    background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; 
+    border-left: 8px solid #7cb342; display: flex; flex-wrap: wrap; 
+    justify-content: space-between; align-items: center; gap: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tabla-scroll { width: 100%; height: 55vh; overflow: auto; background: white; border-radius: 8px; border: 1px solid #ccc; }
+table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+th { background: #558b2f; color: white; padding: 10px; border: 1px solid #3d6121; font-size: 12px; position: sticky; top: 0; z-index: 10; }
+td { border: 1px solid #ddd; height: 40px; text-align: center; }
+
+.input-group { display: flex; align-items: center; background: transparent; height: 100%; }
+.simbolo { padding: 0 8px; font-weight: bold; color: #555; font-size: 12px; }
+.celda { flex: 1; border: none; text-align: center; outline: none; background: transparent; height: 100%; width: 100%; font-size: 13px; box-sizing: border-box; }
+.celda-codigo { font-weight: bold; color: #7f8c8d; background: #f9f9f9; cursor: not-allowed; }
+
+.select-marca { border: none; background: #e8f5e9; cursor: pointer; color: #2e7d32; font-weight: bold; text-align-last: center; }
+.select-pago { border: none; background: #e3f2fd; cursor: pointer; color: #1565c0; font-weight: bold; text-align-last: center; }
+
+.col-azul { background-color: #ebf5ff !important; }
+.col-amarillo { background-color: #fff9c4 !important; font-weight: bold; border: 1px solid #fbc02d !important; }
+.stock-alerta { background-color: #ff9800 !important; color: white !important; font-weight: bold; }
+
+.resumen { background: #1a1a1a; color: #7cb342; padding: 20px; margin-top: 20px; border-radius: 10px; text-align: right; }
+.tasa-box { background: #e8f5e9; padding: 10px; border-radius: 8px; border: 1px solid #7cb342; display: flex; align-items: center; gap: 10px; }
+
+.btn-seguridad { padding: 10px 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; margin-left: 5px; }
+.btn-guardar { background: #27ae60; }
+.btn-cargar { background: #2980b9; }
+
+.seccion {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: #ffffff;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    border-top: 6px solid #558b2f;
+    box-sizing: border-box;
+}
+
+.card h2 { margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-size: 20px; font-weight: bold; letter-spacing: 0.5px; }
+.card p { color: #555555; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #7cb342; }
+
+.card input[type="text"],
+.card input[type="email"],
+.card input[type="tel"],
+.card input[type="number"],
+.card input[type="password"] {
+    width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #cccccc;
+    border-radius: 6px; font-size: 14px; background-color: #fafafa; color: #333333;
+    outline: none; box-sizing: border-box; transition: all 0.3s ease;
+}
+
+.card input:focus { border-color: #7cb342; background-color: #ffffff; box-shadow: 0 0 5px rgba(124, 179, 66, 0.3); }
+.card .btn {
+    width: 100%; padding: 12px; background: #558b2f; color: #ffffff; border: none;
+    border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;
+    letter-spacing: 1px; transition: background 0.2s ease, transform 0.1s ease; margin-top: 5px;
+}
+.card .btn:hover { background: #3d6121; }
+.card .btn:active { transform: scale(0.98); }
+
+.contenedor-pass-ojo {
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 15px; 
+    background-color: #fafafa; 
+    border: 1px solid #cccccc; 
+    border-radius: 6px; 
+    padding-right: 15px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.contenedor-pass-ojo input {
+    border: none !important; 
+    margin-bottom: 0 !important; 
+    flex: 1; 
+    background: transparent !important;
+}
+.contenedor-pass-ojo input:focus {
+    box-shadow: none !important;
+}
+.btn-ojo {
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    font-size: 18px; 
+    padding: 0;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    </style>
+</head>
+<body>
+
+    <div id="seccion-registro" class="seccion" style="display: flex;">
+        <div class="card">
+            <h2>REGISTRO</h2>
+            <input type="text" id="reg-user" placeholder="Nombre de Usuario">
+            <input type="email" id="reg-correo" placeholder="Correo Electrónico">
+            <input type="tel" id="reg-tel" placeholder="Teléfono">
+            <input type="text" id="reg-rif" placeholder="RIF">
+            <button class="btn" onclick="validarRegistro()">REGISTRARSE</button>
+        </div>
+    </div>
+    
+    <div id="seccion-empresa" class="seccion" style="display: none;">
+        <div class="card">
+            <h2>NOMBRE DE LA EMPRESA</h2>
+            <input type="text" id="reg-nombre-empresa" placeholder="Nombre de la Empresa">
+            <button class="btn" onclick="irAPassword()">SIGUIENTE</button>
+        </div>
+    </div>
+
+    <div id="seccion-pass" class="seccion" style="display: none;">
+        <div class="card">
+            <h2>CREAR LLAVE</h2>
+            <div class="contenedor-pass-ojo">
+                <input type="password" id="p1" placeholder="Nueva Contraseña">
+                <button type="button" class="btn-ojo" onclick="toggleVistaContrasena('p1', this)">👁️</button>
+            </div>
+            <div class="contenedor-pass-ojo">
+                <input type="password" id="p2" placeholder="Confirmar Contraseña">
+                <button type="button" class="btn-ojo" onclick="toggleVistaContrasena('p2', this)">👁️</button>
+            </div>
+            <button class="btn" onclick="validarPass()">ACTIVAR</button>
+        </div>
+    </div>
+
+    <div id="seccion-bloqueo" class="seccion" style="display: none;">
+        <div class="card">
+            <h2>SISTEMA BLOQUEADO</h2>
+            <p style="text-align: center; border-left: 4px solid #e74c3c;">Ingrese su llave para desbloquear el libro de inventario.</p>
+            <div class="contenedor-pass-ojo">
+                <input type="password" id="pass-desbloqueo" placeholder="Introduzca Contraseña">
+                <button type="button" class="btn-ojo" onclick="toggleVistaContrasena('pass-desbloqueo', this)">👁️</button>
+            </div>
+            <button class="btn" style="background: #e74c3c;" onclick="desbloquearInventario()">DESBLOQUEAR</button>
+        </div>
+    </div>
+
+    <div id="seccion-tutorial" class="seccion" style="display: none;">
+        <div class="card">
+            <h2>¿CÓMO USAR?</h2>
+            <p style="font-size: 14px; line-height: 1.6;">
+                1. Registre producto, marca y cantidad inicial.<br>
+                2. Use <b>STOCK</b> para lo que el cliente lleva.<br>
+                3. Toque <b>VENTA</b> para restar del inventario.<br>
+                4. Escriba el total generado en <b>TOTAL VENDIDO</b>.
+            </p>
+            <button class="btn" onclick="irAlLibro()">ENTRAR AL LIBRO</button>
+        </div>
+    </div>
+
+    <div id="pantalla-libro" style="display: none;">
+        
+        <div class="encabezado-empresa-centrado">
+            <h2 id="display-empresa">Cargando Empresa...</h2>
+            <p id="display-rif">RIF: Cargando...</p>
+        </div>
+
+        <div class="header-libro">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" id="buscador" onkeyup="buscar()" placeholder="🔍 Buscar por código o nombre..." style="width: 260px; padding: 7px; border: 1px solid #ccc; border-radius: 4px;">
+                
+                <div style="display: flex; gap: 5px; align-items: center;">
+                      <label style="font-size: 10px; font-weight: bold; display: block;">TASA BCV:</label>
+                    <input type="number" id="tasa-dia" value="45" oninput="recalcularTodoBs()" style="width: 60px; margin: 0; padding: 5px;">
+                </div>
+            </div>
+            
+            <div class="tasa-box">
+                <div>
+                    
+                    <button class="btn-seguridad btn-guardar" onclick="exportarRespaldoSeguro()">💾 GUARDAR RESPALDO</button>
+                    <button class="btn-seguridad btn-cargar" onclick="document.getElementById('input-archivo').click()">📂 CARGAR RESPALDO</button>
+                    <button onclick="generarFilaVacia()" style="background:#7cb342; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; margin-top:10px;">+ AGREGAR FILA</button>
+                    <input type="file" id="input-archivo" style="display: none;" onchange="importarRespaldoSeguro(this)">
+                </div>
+                <div>
+                    <button class="btn-seguridad" onclick="abrirHistorial()" style="background: #2c3e50;">📊 REPORTES</button>
+                    <button class="btn-seguridad" onclick="abrirPantallaRegistro()" style="background: #27ae60;">📥 REGISTRAR PRODUCTO</button>
+                    <button class="btn-seguridad"   onclick="cerrarInventario()" style="background: #e67e22; padding: 5px 40px; font-size: 11px;">🔒 BLOQUEAR</button>
+                    <button class="btn-seguridad" onclick="cerrarSesion()" style="background: #c0392b; padding: 5px 40px; font-size: 11px;">🚪 CERRAR SESIÓN</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabla-scroll">
+            <table id="miTabla">
+                <thead>
+                    <tr>
+                        <th style="width: 90px;">CÓDIGO</th>
+                        <th style="width: 180px;">PRODUCTO</th>
+                        <th style="width: 130px;">MARCA</th>
+                        <th>STOCK</th>
+                        <th>PRECIO UNIT ($)</th>
+                        <th>PRECIO UNIT (BS)</th>  
+                        <th style="background: #2980b9; color: white;">VENTA</th> 
+                        <th style="background: #fbc02d; color: #000;">TOTAL ($)</th>
+                        <th style="background: #1565c0; color: white;">FORMA DE PAGO</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla"></tbody>
+            </table>
+        </div>
+
+        <div class="resumen">
+            <p style="margin:0; font-size: 16px; color: #fff;">TOTAL EN MESA ACTUAL: $ <span id="gran-total-usd">0.00</span></p>
+            <p style="margin:0; font-size: 18px; font-weight: bold;">TOTAL EN MESA ACTUAL: BS <span id="gran-total-bs-en-vivo">0.00</span></p>
+            
+            <button onclick="procesarVentaGlobal()" style="background:#2ecc71; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; margin-right: 10px;">⚡ PROCESAR VENTA</button>
+            <button onclick="compartirReciboUltimaVenta()" style="background:#2980b9; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; margin-top:10px; font-weight:bold; margin-right: 10px;">📄 ENVIAR RECIBO</button>
+           </div>
+       </div> 
+  
+    <div id="pantalla-reporte" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f7f6; z-index: 200; padding: 20px; box-sizing: border-box; overflow-y: auto;">
+        <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 8px solid #2980b9; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div>
+                <h3 style="margin: 0; color: #2c3e50;">SHARE SNEAKERS</h3>
+                <p style="margin: 0; font-size: 11px; color: #666;">REPORTE GENERAL DE VENTAS</p>
+            </div>
+            <button onclick="cerrarHistorial()" style="background: #2c3e50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px;">⬅ VOLVER AL INVENTARIO</button>
+        </div>
+
+        <div class="tabla-scroll" style="height: 60vh;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 1100px;">
+                <thead>
+                    <tr>
+                        <th style="width: 130px;">FECHA</th>
+                        <th style="width: 180px;">PRODUCTO / MODELO</th>
+                        <th style="width: 150px;">MARCA</th>
+                        <th style="width: 100px;">CANT. LLEVADA</th>
+                        <th style="width: 150px;">TOTAL COBRADO ($)</th>
+                        <th style="width: 180px;">TOTAL COBRADO (BS)</th>
+                        <th style="background: #1565c0; color: white; width: 140px;">PAGO CON</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-historial"></tbody>
+            </table>
+        </div>
+
+        <div style="background: #1a1a1a; color: #2ecc71; padding: 20px; margin-top: 15px; border-radius: 10px; text-align: right;">
+            <p style="margin: 0; font-size: 16px; color: #fff;">BRUTO ACUMULADO EN DÓLARES: <span style="color:#2ecc71; font-weight:bold;">$ <span id="total-modal-usd">0.00</span></span></p>
+            <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">TOTAL GANANCIA NETA: BS <span id="total-acumulado-modal">0.00</span></p>
+        </div>
+    </div>
+
+    <div id="pantalla-registrar-bultos" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f7f6; z-index: 200; padding: 20px; box-sizing: border-box; overflow-y: auto;">
+        <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 8px solid #27ae60; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div>
+                <h3 style="margin: 0; color: #2c3e50;">📥 ENTRADA DE MERCANCÍA</h3>
+                <p style="margin: 0; font-size: 11px; color: #666;">REGISTRE NUEVOS LOTES POR BULTOS</p>
+            </div>
+            <button onclick="cerrarPantallaRegistro()" style="background: #2c3e50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px;">⬅ VOLVER AL INVENTARIO</button>
+        </div>
+
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 500px; margin: 30px auto; display: flex; flex-direction: column; gap: 15px;">
+            <label style="font-weight: bold; color: #333;">Nombre del Producto</label>
+            <input type="text" id="reg-producto" placeholder="Ej: Arroz" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            
+            <label style="font-weight: bold; color: #333;">Marca</label>
+            <input type="text" id="reg-marca" placeholder="Ej: Mary" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            
+            <label style="font-weight: bold; color: #333;">Unidades por Paca/Bulto</label>
+            <input type="number" id="reg-unidades-bulto" placeholder="Ej: 50" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            
+            <label style="font-weight: bold; color: #333;">Cantidad de Bultos</label>
+            <input type="number" id="reg-bultos" placeholder="Ej: 4" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            
+            <label style="font-weight: bold; color: #333;">Precio Venta Unitario ($)</label>
+            <input type="number" id="reg-precio" placeholder="Ej: 1.20" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            
+            <button onclick="registrarProducto()" style="padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 10px;">GUARDAR EN INVENTARIO</button>
+        </div>
+    </div>
+
+<script>
+    
+    let listaMarcas = ["Generica", "Nike", "Addidas", "Levi's", "Zara", "Oveja", "Puma"];
+    let historialVentas = []; 
+    let ultimaVentaProcesada = [];
+    let contadorCodigo = 1;
+
+    let datosRegistro = { usuario: "", correo: "", telefono: "", rif: "", nombreEmpresa: "" };
+    let contrasenaCreada = "";
+    
+    window.arregloInventario = JSON.parse(localStorage.getItem("arregloInventario")) || [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+        let passGuardada = localStorage.getItem('guardado_user_pass');
+        let empresaGuardada = localStorage.getItem('guardado_empresa');
+        let rifGuardado = localStorage.getItem('guardado_rif');
+
+        if (passGuardada && empresaGuardada && rifGuardado) {
+            contrasenaCreada = passGuardada;
+            datosRegistro.nombreEmpresa = empresaGuardada;
+            datosRegistro.rif = rifGuardado;
+
+            document.getElementById('display-empresa').innerText = empresaGuardada.toUpperCase();
+            document.getElementById('display-rif').innerText = "RIF: " + rifGuardado.toUpperCase() + " | INVENTARIO SEGURIZADO";
+
+            document.getElementById('seccion-registro').style.display = 'none';
+            document.getElementById('seccion-tutorial').style.display = 'none'; 
+            document.getElementById('seccion-bloqueo').style.display = 'flex';
+            document.getElementById('pantalla-libro').style.display = 'none';
+        } else {
+            document.getElementById('seccion-registro').style.display = 'flex';
+            document.getElementById('seccion-bloqueo').style.display = 'none';
+            document.getElementById('pantalla-libro').style.display = 'none';
+        }
+    });
+
+    function validarRegistro() {
+        let user = document.getElementById('reg-user').value.trim();
+        let correo = document.getElementById('reg-correo').value.trim();
+        let tel = document.getElementById('reg-tel').value.trim();
+        let rif = document.getElementById('reg-rif').value.trim();
+
+        if (user === "" || correo === "" || tel === "" || rif === "") {
+            alert("Por favor, rellene todos los campos para el registro.");
+            return;
+        }
+
+        let regexCorreo = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.com$/;
+        if (!regexCorreo.test(correo)) {
+            alert("Error en el Correo:\n- Debe estar todo en minúsculas.\n- Debe incluir el @ y terminar en .com");
+            return;
+        }
+        
+        let regexTel = /^(0412|0426|0414|0424)\d{7}$/;
+        if (!regexTel.test(tel)) {
+            alert("Error en el Teléfono:\n- Solo se permite: 0412, 0426, 0414 o 0424.\n- Debe tener exactamente 11 dígitos en total (sin espacios ni guiones).");
+            return;
+        }
+
+        let regexRif = /^J-\d{8,9}$/;
+        if (!regexRif.test(rif)) {
+            alert("Error en el RIF:\n- Debe comenzar con 'J-' en mayúscula.\n- Seguido de 8 o 9 números según la empresa.\n- Ejemplo: J-123456789");
+            return;
+        }
+  
+        datosRegistro.usuario = user;
+        datosRegistro.correo = correo;
+        datosRegistro.telefono = tel;
+        datosRegistro.rif = rif;
+
+        let correoHistorial = localStorage.getItem('historial_ultimo_correo');
+        let rifHistorial = localStorage.getItem('historial_ultimo_rif');
+        let empresaHistorial = localStorage.getItem('historial_ultima_empresa');
+
+        if (correo === correoHistorial && rif === rifHistorial) {
+            datosRegistro.nombreEmpresa = empresaHistorial || "Mi Empresa";
+            document.getElementById('seccion-registro').style.display = 'none';
+            document.getElementById('seccion-pass').style.display = 'flex';
+        } else {
+            document.getElementById('seccion-registro').style.display = 'none';
+            document.getElementById('seccion-empresa').style.display = 'flex';
+        }
+    }
+     
+    function irAPassword() {
+        let empresa = document.getElementById('reg-nombre-empresa').value.trim();
+        if (empresa === "") {
+            alert("Por favor, ingrese el nombre de su empresa.");
+            return;
+        }
+        datosRegistro.nombreEmpresa = empresa;
+
+        document.getElementById('seccion-empresa').style.display = 'none';
+        document.getElementById('seccion-pass').style.display = 'flex';
+    }
+
+    function validarPass() {
+        let p1 = document.getElementById('p1').value;
+        let p2 = document.getElementById('p2').value;
+
+        if (p1 === "" || p2 === "") {
+            alert("Por favor, asigne una contraseña.");
+            return;
+        }
+        if (p1 !== p2) {
+            alert("Las contraseñas no coinciden. Verifique por favor.");
+            return;
+        }
+        contrasenaCreada = p1;
+        
+        localStorage.setItem('guardado_user_pass', p1);
+        localStorage.setItem('guardado_empresa', datosRegistro.nombreEmpresa);
+        localStorage.setItem('guardado_rif', datosRegistro.rif);
+
+        localStorage.setItem('historial_ultimo_correo', datosRegistro.correo);
+        localStorage.setItem('historial_ultimo_rif', datosRegistro.rif);
+        localStorage.setItem('historial_ultima_empresa', datosRegistro.nombreEmpresa);
+        
+        document.getElementById('seccion-pass').style.display = 'none';
+        document.getElementById('seccion-tutorial').style.display = 'flex';
+    }
+
+    function irAlLibro() {
+        document.getElementById('seccion-tutorial').style.display = 'none';
+        document.getElementById('display-empresa').innerText = datosRegistro.nombreEmpresa.toUpperCase();
+        document.getElementById('display-rif').innerText = "RIF: " + datosRegistro.rif.toUpperCase() + " | INVENTARIO SEGURIZADO";
+        document.getElementById('pantalla-libro').style.display = 'block';
+    }
+
+    function generarFilaVacia() {
+        const tabla = document.getElementById('cuerpo-tabla');
+        let fila = document.createElement('tr');
+        
+        let codigoUnico = "PROD-" + String(contadorCodigo).padStart(3, '0');
+        contadorCodigo++;
+
+        fila.innerHTML = `
+            <td><input type="text" class="celda celda-codigo" value="${codigoUnico}" readonly></td>
+            <td>
+                <select class="celda nom-prod" onchange="alCambiarProducto(this)" style="text-align: left; padding-left: 10px;">
+                    <option value="">-- Producto --</option>
+                </select>
+            </td>
+            <td>
+                <select class="celda select-marca" onchange="alCambiarMarca(this)">
+                    <option value="">-- Marca --</option>
+                </select>
+            </td>
+            <td>
+                <div style="display:flex; flex-direction:column; font-size:11px; font-weight:bold;">
+                    <input type="number" class="celda stock-disponible" oninput="verificarAlertaStock(this)" placeholder="0" readonly>
+                    <span class="cant-bultos" style="color: #7f8c8d;">Bultos: 0</span>
+                </div>
+            </td>
+            <td><div class="input-group"><span class="simbolo">$</span><input type="number" class="celda precio-usd" oninput="calcularDesdeUsd(this)" placeholder="0.00" style="text-align: right; padding-right: 10px;"></div></td>
+            <td><div class="input-group"><span class="simbolo">Bs.</span><input type="number" class="celda precio-bs" oninput="calcularDesdeBs(this)" placeholder="0.00" style="text-align: right; padding-right: 10px;"></div></td>
+            <td class="col-azul"><input type="number" class="celda stok-vta" oninput="recalcularFilaPorVenta(this)" placeholder="0"></td>
+            <td class="col-amarillo"><div class="input-group"><span class="simbolo">$</span><input type="number" class="celda celda-total" readonly placeholder="0.00" style="text-align: right; padding-right: 10px;"></div></td>
+            <td class="col-azul">
+                <select class="celda select-pago">
+                    <option value="Efectivo">💵 Efectivo</option>
+                    <option value="Pago Móvil">📱 Pago Móvil</option>
+                    <option value="Punto">💳 Punto</option>
+                </select>
+            </td>
+        `;
+        tabla.appendChild(fila);
+        
+        if (typeof actualizarTodosLosSelectores === "function") {
+            actualizarTodosLosSelectores();
+        }
+    }
+
+    function calcularDesdeUsd(input) {
+        let fila = input.closest('tr');
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+        let pUsd = parseFloat(fila.querySelector('.precio-usd').value) || 0;
+        let cantVenta = parseFloat(fila.querySelector('.stok-vta').value) || 0;
+        
+        if (tasa > 0) {
+            fila.querySelector('.precio-bs').value = (pUsd * tasa).toFixed(2);
+        }
+        fila.querySelector('.celda-total').value = (pUsd * cantVenta).toFixed(2);
+        sumarMesaActual();
+    }
+
+    function calcularDesdeBs(input) {
+        let fila = input.closest('tr');
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+        let pBs = parseFloat(fila.querySelector('.precio-bs').value) || 0;
+        let cantVenta = parseFloat(fila.querySelector('.stok-vta').value) || 0;
+        
+        if (tasa > 0) {
+            let calculadoUsd = pBs / tasa;
+            fila.querySelector('.precio-usd').value = calculadoUsd.toFixed(2);
+            fila.querySelector('.celda-total').value = (calculadoUsd * cantVenta).toFixed(2);
+        }
+        sumarMesaActual();
+    }
+
+    function recalcularFilaPorVenta(input) {
+        let fila = input.closest('tr');
+        let pUsd = parseFloat(fila.querySelector('.precio-usd').value) || 0;
+        let cantVenta = parseFloat(input.value) || 0;
+        
+        fila.querySelector('.celda-total').value = (pUsd * cantVenta).toFixed(2);
+        sumarMesaActual();
+    }
+    
+    function exportarRespaldoSeguro() {
+        let paqueteDatos = {
+            inventario: window.arregloInventario,
+            historial: historialVentas,
+            tasa: document.getElementById('tasa-dia').value,
+            ultimoId: contadorCodigo
+        };
+
+        let jsonTexto = JSON.stringify(paqueteDatos);
+        let textoCifrado = btoa(unescape(encodeURIComponent(jsonTexto)));
+
+        let blob = new Blob([textoCifrado], { type: "text/plain;charset=utf-8" });
+        let enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = "RESPALDO_SEGURO_SHARE.txt";
+        enlace.click();
+    }
+
+    function importarRespaldoSeguro(input) {
+        let archivo = input.files[0];
+        if (!archivo) return;
+
+        let lector = new FileReader();
+        lector.onload = function(e) {
+            try {
+                let textoCifrado = e.target.result;
+                let jsonTexto = decodeURIComponent(escape(atob(textoCifrado)));
+                let paqueteDatos = JSON.parse(jsonTexto);
+
+                document.getElementById('tasa-dia').value = paqueteDatos.tasa || 45;
+                historialVentas = paqueteDatos.historial || [];
+                contadorCodigo = paqueteDatos.ultimoId || 1;
+                window.arregloInventario = paqueteDatos.inventario || [];
+                localStorage.setItem("arregloInventario", JSON.stringify(window.arregloInventario));
+
+                const tabla = document.getElementById('cuerpo-tabla');
+                tabla.innerHTML = "";
+                for(let i=0; i<10; i++) generarFilaVacia();
+                actualizarTodosLosSelectores();
+
+                recalcularTodoBs();
+                alert("¡Base de datos descifrada y cargada con éxito!");
+            } catch (err) {
+                alert("Error de seguridad: El archivo de respaldo está corrupto o alterado.");
+            }
+        };
+        lector.readAsText(archivo);
+        input.value = "";
+    }
+
+    function verificarAlertaStock(input) {
+        if(!input) return;
+        let valor = parseInt(input.value);
+        if (!isNaN(valor) && valor <= 3 && valor >= 0) {
+            input.classList.add('stock-alerta');
+        } else {
+            input.classList.remove('stock-alerta');
+        }
+    }
+
+    function procesarVentaGlobal() {
+        ultimaVentaProcesada = [];
+        let filas = document.querySelectorAll("#cuerpo-tabla tr");
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+        let ventasRealizadas = 0;
+
+        filas.forEach(fila => {
+            let inputVenta = fila.querySelector('.stok-vta');
+            if (!inputVenta) return;
+
+            let ventaUnidades = parseInt(inputVenta.value) || 0;
+            
+            if (ventaUnidades > 0) {
+                let stockCaja = fila.querySelector('.stock-disponible');
+                let stockActual = parseInt(stockCaja.value) || 0;
+                let producto = fila.querySelector('.nom-prod').value || "Sin nombre";
+                let marca = fila.querySelector('.select-marca').value || "Genérica";
+                let totalDolarFila = parseFloat(fila.querySelector('.celda-total').value) || 0;
+                let fPago = fila.querySelector('.select-pago').value;
+                let fecha = new Date().toLocaleDateString('es-VE');
+               
+                if (ventaUnidades <= stockActual) {
+                    stockCaja.value = stockActual - ventaUnidades;
+                    verificarAlertaStock(stockCaja);
+
+                    let productoExistente = historialVentas.find(v => 
+                        v.producto.toUpperCase() === producto.toUpperCase() && 
+                        v.marca.toUpperCase() === marca.toUpperCase() && 
+                        v.fecha === fecha && 
+                        v.formaPago === fPago
+                    );
+
+                    if (productoExistente) {
+                        productoExistente.cantidad += ventaUnidades;
+                        productoExistente.totalUsd += totalDolarFila;
+                        productoExistente.totalBs += (totalDolarFila * tasa);
+                    } else {
+                        historialVentas.push({
+                            fecha, producto, marca, cantidad: ventaUnidades,
+                            totalUsd: totalDolarFila, totalBs: totalDolarFila * tasa, formaPago: fPago
+                        });
+                    }
+
+                    if (window.arregloInventario) {
+                        let itemInventario = window.arregloInventario.find(item => item.producto === producto && item.marca === marca);
+                        if (itemInventario) {
+                            itemInventario.stockUnidades = stockActual - ventaUnidades;
+                            itemInventario.bultos = Math.ceil(itemInventario.stockUnidades / itemInventario.unidadesPorBulto);
+                            localStorage.setItem("arregloInventario", JSON.stringify(window.arregloInventario));
+                            
+                            let labelBultos = fila.querySelector('.cant-bultos');
+                            if (labelBultos) labelBultos.innerText = `Bultos: ${itemInventario.bultos}`;
+                        }
+                    }
+
+                    ultimaVentaProcesada.push({ producto, marca, cantidad: ventaUnidades, totalUsd: totalDolarFila, formaPago: fPago });
+
+                    fila.querySelector('.stok-vta').value = "";
+                    fila.querySelector('.celda-total').value = "";
+                    ventasRealizadas++;
+                } else {
+                    alert(`Error en "${producto}": Stock insuficiente.`);
+                }
+            }
+        });
+
+        if (ventasRealizadas > 0) {
+            sumarMesaActual();
+            alert("¡Venta procesada de manera consolidada!");
+        }
+    }
+
+    function compartirReciboUltimaVenta() {
+        if (ultimaVentaProcesada.length === 0) return alert("No hay ventas procesadas.");
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+        let totalUsd = 0;
+        let texto = `💹 inventario 💹\n🧾 *NOTA DE ENTREGA*\n\n`;
+
+        ultimaVentaProcesada.forEach(item => {
+            texto += `▪️ *${item.cantidad}x* ${item.producto} (${item.marca})\n    Total: $${item.totalUsd.toFixed(2)}\n`;
+            totalUsd += item.totalUsd;
+        });
+        texto += `\n💰 *TOTAL:* $${totalUsd.toFixed(2)} / Bs.${(totalUsd * tasa).toFixed(2)}`;
+
+        if (navigator.share) navigator.share({ title: 'Recibo', text: texto });
+        else alert(texto);
+    }
+
+    function sumarMesaActual() {
+        let celdas = document.querySelectorAll(".celda-total");
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+        let usd = 0;
+        celdas.forEach(c => usd += (parseFloat(c.value) || 0));
+        document.getElementById("gran-total-usd").innerText = usd.toFixed(2);
+        document.getElementById("gran-total-bs-en-vivo").innerText = (usd * tasa).toFixed(2);
+    }
+
+    function buscar() {
+        let filter = document.getElementById("buscador").value.toUpperCase();
+        let filas = document.querySelectorAll("#cuerpo-tabla tr");
+        
+        filas.forEach(f => {
+            let inputCodigo = f.querySelector(".celda-codigo");
+            let inputProd = f.querySelector(".nom-prod");
+            if (inputCodigo && inputProd) {
+                let textoCodigo = inputCodigo.value.toUpperCase();
+                let textoProd = inputProd.value.toUpperCase();
+                if (textoCodigo.indexOf(filter) > -1 || textoProd.indexOf(filter) > -1) {
+                    f.style.display = "";
+                } else {
+                    f.style.display = "none";
+                }
+            }
+        });
+    }
+
+    function recalcularTodoBs() {
+        document.querySelectorAll(".precio-usd").forEach(i => calcularDesdeUsd(i));
+    }
+
+    function abrirHistorial() {
+        const hCuerpo = document.getElementById('cuerpo-historial');
+        hCuerpo.innerHTML = ""; 
+        let tBs = 0, tUsd = 0;
+
+        historialVentas.forEach(v => {
+            tBs += v.totalBs; 
+            tUsd += v.totalUsd;
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${v.fecha}</td>
+                <td style="text-align: left; padding-left: 10px;">${v.producto}</td>
+                <td>${v.marca}</td>
+                <td>${v.cantidad}</td>
+                <td style="text-align: right; padding-right: 10px;">$${v.totalUsd.toFixed(2)}</td>
+                <td style="text-align: right; padding-right: 10px;">Bs.${v.totalBs.toFixed(2)}</td>
+                <td>${v.formaPago}</td>
+            `;
+            hCuerpo.appendChild(tr);
+        });
+
+        document.getElementById("total-modal-usd").innerText = tUsd.toFixed(2);
+        document.getElementById("total-acumulado-modal").innerText = tBs.toFixed(2);
+        
+        document.getElementById('pantalla-libro').style.display = 'none';
+        document.getElementById('pantalla-reporte').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function cerrarHistorial() {
+        document.getElementById('pantalla-reporte').style.display = 'none';
+        document.getElementById('pantalla-libro').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function registrarProducto() {
+        let prod = document.getElementById('reg-producto').value.trim();
+        let marca = document.getElementById('reg-marca').value.trim();
+        let unidadesPorBulto = parseInt(document.getElementById('reg-unidades-bulto').value) || 0;
+        let bultos = parseInt(document.getElementById('reg-bultos').value) || 0;
+        let precio = parseFloat(document.getElementById('reg-precio').value) || 0;
+
+        if (!prod || !marca || unidadesPorBulto <= 0 || bultos <= 0 || precio <= 0) {
+            alert("Por favor, rellene todos los campos de registro correctamente.");
+            return;
+        }
+
+        let stockTotal = unidadesPorBulto * bultos;
+
+        let existente = window.arregloInventario.find(item => item.producto.toUpperCase() === prod.toUpperCase() && item.marca.toUpperCase() === marca.toUpperCase());
+
+        if (existente) {
+            existente.bultos += bultos;
+            existente.stockUnidades += stockTotal;
+            existente.precioUSD = precio; 
+        } else {
+            window.arregloInventario.push({
+                producto: prod,
+                marca: marca,
+                bultos: bultos,
+                unidadesPorBulto: unidadesPorBulto,
+                stockUnidades: stockTotal,
+                precioUSD: precio
+            });
+        }
+
+        localStorage.setItem("arregloInventario", JSON.stringify(window.arregloInventario));
+        alert(`¡${prod} (${marca}) registrado! Total: ${stockTotal} unidades.`);
+        
+        document.getElementById('reg-producto').value = "";
+        document.getElementById('reg-marca').value = "";
+        document.getElementById('reg-unidades-bulto').value = "";
+        document.getElementById('reg-bultos').value = "";
+        document.getElementById('reg-precio').value = "";
+
+        cerrarPantallaRegistro();
+        actualizarTodosLosSelectores();
+    }
+
+    function actualizarTodosLosSelectores() {
+        let selectoresProductos = document.querySelectorAll('.nom-prod');
+        let productosUnicos = [...new Set(window.arregloInventario.map(item => item.producto))];
+
+        selectoresProductos.forEach(select => {
+            let valorActual = select.value;
+            select.innerHTML = '<option value="">-- Producto --</option>';
+            productosUnicos.forEach(p => {
+                let opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                select.appendChild(opt);
+            });
+            select.value = valorActual;
+        });
+    }
+
+    function alCambiarProducto(selectElement) {
+        let fila = selectElement.closest('tr');
+        let productoSeleccionado = selectElement.value;
+        let selectMarca = fila.querySelector('.select-marca');
+        
+        selectMarca.innerHTML = '<option value="">-- Marca --</option>';
+        fila.querySelector('.stock-disponible').value = "";
+        fila.querySelector('.cant-bultos').innerText = "Bultos: 0";
+        fila.querySelector('.precio-usd').value = "";
+        fila.querySelector('.precio-bs').value = "";
+
+        if (!productoSeleccionado) retur;
+
+        let marcasFiltradas = window.arregloInventario.filter(item => item.producto === productoSeleccionado);
+        marcasFiltradas.forEach(item => {
+            let opt = document.createElement('option');
+            opt.value = item.marca;
+            opt.textContent = item.marca;
+            selectMarca.appendChild(opt);
+        });
+    }
+
+    function alCambiarMarca(selectElement) {
+        let fila = selectElement.closest('tr');
+        let prod = fila.querySelector('.nom-prod').value;
+        let marca = selectElement.value;
+        let tasa = parseFloat(document.getElementById('tasa-dia').value) || 0;
+
+        if (!prod || !marca) return;
+
+        let itemMatch = window.arregloInventario.find(item => item.producto === prod && item.marca === marca);
+
+        if (itemMatch) {
+            fila.querySelector('.stock-disponible').value = itemMatch.stockUnidades;
+            fila.querySelector('.cant-bultos').innerText = `Bultos: ${itemMatch.bultos}`;
+            fila.querySelector('.precio-usd').value = itemMatch.precioUSD.toFixed(2);
+            if (tasa > 0) {
+                fila.querySelector('.precio-bs').value = (itemMatch.precioUSD * tasa).toFixed(2);
+            }
+            verificarAlertaStock(fila.querySelector('.stock-disponible'));
+        }
+    }
+
+    function abrirPantallaRegistro() {
+        document.getElementById('pantalla-libro').style.display = 'none';
+        document.getElementById('seccion-registro').style.display = 'none';
+        document.getElementById('pantalla-registrar-bultos').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function cerrarPantallaRegistro() {
+        document.getElementById('pantalla-registrar-bultos').style.display = 'none';
+        document.getElementById('pantalla-libro').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function toggleVistaContrasena(idInput, boton) {
+        let inputPass = document.getElementById(idInput);
+        if (inputPass.type === 'password') {
+            inputPass.type = 'text';
+            boton.innerText = '👁️';
+        } else {
+            inputPass.type = 'password';
+            boton.innerText = '👁️';
+        }
+    }
+
+    for(let i=0; i<10; i++) generarFilaVacia();
+    actualizarTodosLosSelectores();
+
+    function desbloquearInventario() {
+        let passIntroducida = document.getElementById('pass-desbloqueo').value;
+        
+        if (passIntroducida === contrasenaCreada) {
+            document.getElementById('seccion-bloqueo').style.display = 'none';
+            document.getElementById('seccion-tutorial').style.display = 'none';
+            document.getElementById('pantalla-libro').style.display = 'block';
+            document.getElementById('pantalla-registrar-bultos').style.display = 'none';
+        } else {
+            alert("Contraseña incorrecta. Acceso denegado.");
+        }
+    }
+
+    function cerrarInventario() {
+        document.getElementById('pantalla-libro').style.display = 'none';
+        document.getElementById('seccion-tutorial').style.display = 'none';
+        document.getElementById('pass-desbloqueo').value = "";
+        document.getElementById('seccion-bloqueo').style.display = 'flex';
+    }
+
+    function cerrarSesion() {
+        if (confirm("¿Está seguro de que desea cerrar la sesión? Se desvinculará el inicio automático para que pueda iniciar otra cuenta.")) {
+            
+            localStorage.removeItem('guardado_user_pass');
+            localStorage.removeItem('guardado_empresa');
+            localStorage.removeItem('guardado_rif');
+            
+            contrasenaCreada = "";
+            
+            document.getElementById('reg-user').value = "";
+            document.getElementById('reg-correo').value = "";
+            document.getElementById('reg-tel').value = "";
+            document.getElementById('reg-rif').value = "";
+            document.getElementById('reg-nombre-empresa').value = "";
+            document.getElementById('p1').value = "";
+            document.getElementById('p2').value = "";
+
+            document.getElementById('pantalla-libro').style.display = 'none';
+            document.getElementById('seccion-bloqueo').style.display = 'none';
+            document.getElementById('seccion-tutorial').style.display = 'none';
+            document.getElementById('seccion-registro').style.display = 'flex';
+        }
+    }
+
+</script>
+</body>
+</html>
